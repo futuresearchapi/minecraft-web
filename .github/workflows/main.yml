@@ -52,7 +52,7 @@ jobs:
         if: steps.check_release.outputs.release_found == 'false'
         run: |
           echo "No new release. Exiting workflow."
-          exit 1
+          exit 0
 
       # 2. Checkout repo
       - name: Checkout repo

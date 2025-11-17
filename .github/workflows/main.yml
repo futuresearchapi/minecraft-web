@@ -10,34 +10,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout your repo
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Download minecraft.html from latest release
-        uses: robinraju/release-downloader@v1
-        with:
-          repository: "zardoy/minecraft-web-client"
-          latest: true
-          fileName: "minecraft.html"
-
-      - name: List downloaded files (debug)
-        run: ls -R
-
-      - name: Clear old site files
+      # Clear old site files
+      - name: Clear old files
         run: |
           find . -maxdepth 1 ! -name ".git" ! -name ".github" ! -name ".gitignore" -exec rm -rf {} +
 
-      - name: Move minecraft.html to index.html if it exists
+      # Download minecraft.html directly from GitHub release URL
+      - name: Download minecraft.html
         run: |
-          if [ -f minecraft.html ]; then
-            mv minecraft.html index.html
-            echo "minecraft.html moved to index.html"
+          curl -L -o index.html https://github.com/zardoy/minecraft-web-client/releases/latest/download/minecraft.html
+
+      # Verify the file exists
+      - name: Check index.html
+        run: |
+          if [ -f index.html ]; then
+            echo "index.html downloaded successfully."
           else
-            # If running manually and file missing, just skip instead of failing
-            echo "minecraft.html not found — skipping this run"
-            exit 0
+            echo "Failed to download index.html"
+            exit 1
           fi
 
+      # Commit and push changes
       - name: Commit and push changes
         run: |
           git config user.name "github-actions"

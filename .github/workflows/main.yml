@@ -1,4 +1,4 @@
-name: Sync
+name: Sync external minecraft.html release to Netlify
 
 on:
   schedule:
@@ -14,56 +14,17 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # 2. Get latest release tag from GitHub API
-      - name: Get latest release version
-        id: get_release
-        run: |
-          LATEST_TAG=$(curl -s https://api.github.com/repos/zardoy/minecraft-web-client/releases/latest | jq -r .tag_name)
-          echo "Latest release: $LATEST_TAG"
-          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
-
-      # 3. Read current version (if exists)
-      - name: Read current version
-        id: current_version
-        run: |
-          if [ -f .version ]; then
-            CURRENT_TAG=$(cat .version)
-            echo "Current version: $CURRENT_TAG"
-          else
-            CURRENT_TAG=""
-            echo "No current version found"
-          fi
-          echo "current_tag=$CURRENT_TAG" >> $GITHUB_OUTPUT
-
-      # 4. Compare versions
-      - name: Check if update is needed
-        id: check_update
-        run: |
-          LATEST="${{ steps.get_release.outputs.latest_tag }}"
-          CURRENT="${{ steps.current_version.outputs.current_tag || '' }}"
-          if [ "$LATEST" = "$CURRENT" ]; then
-            echo "Already up to date. Skipping download."
-            echo "update_needed=false" >> $GITHUB_OUTPUT
-          else
-            echo "New release detected. Will update."
-            echo "update_needed=true" >> $GITHUB_OUTPUT
-
-      # 5. Stop workflow if no update
-      - name: Exit if no update
-        if: ${{ steps.check_update.outputs.update_needed == 'false' }}
-        run: exit 0
-
-      # 6. Clear old site files (keep all hidden files, including .version)
+      # 2. Clear old site files (keep .git, workflow, .gitignore)
       - name: Clear old files
         run: |
-          find . -mindepth 1 -maxdepth 1 ! -name ".*" -exec rm -rf {} + || true
+          find . -mindepth 1 -maxdepth 1 ! -name ".git" ! -name ".github" ! -name ".gitignore" -exec rm -rf {} + || true
 
-      # 7. Download minecraft.html
+      # 3. Download minecraft.html directly from latest release
       - name: Download minecraft.html
         run: |
           curl -L -o index.html https://github.com/zardoy/minecraft-web-client/releases/latest/download/minecraft.html
 
-      # 8. Verify the file exists
+      # 4. Verify the file exists
       - name: Verify index.html
         run: |
           if [ -f index.html ]; then
@@ -73,13 +34,8 @@ jobs:
             exit 0
           fi
 
-      # 9. Update version file
-      - name: Update version file
-        run: |
-          echo "${{ steps.get_release.outputs.latest_tag }}" > .version
-
-      # 10. Commit and push only if there are changes
-      - name: Commit and push
+      # 5. Commit and push only if there are changes
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -88,5 +44,5 @@ jobs:
             echo "No changes — skipping commit."
             exit 0
           fi
-          git commit -m "Update index.html to version ${{ steps.get_release.outputs.latest_tag }}"
+          git commit -m "Update index.html from latest minecraft.html release"
           git push

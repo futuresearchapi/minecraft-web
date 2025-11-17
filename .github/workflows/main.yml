@@ -60,4 +60,4 @@ jobs:
             exit 0
           fi
           git commit -m "Update site from latest self-host.zip release"
-          git push￼Enter
+          git push

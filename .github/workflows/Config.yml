@@ -1,4 +1,4 @@
-name: Update Config Workflow
+name: Update Config 
 
 on:
   # Manual trigger

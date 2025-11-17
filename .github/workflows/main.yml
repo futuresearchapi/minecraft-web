@@ -1,55 +1,17 @@
-name: Build
+name: Download and Extract ZIP
 
 on:
   schedule:
-    - cron: "0 0 */2 * *"  # every 2 days
-  workflow_dispatch:
+    - cron: '0 0 */2 * *'  # Every 2 days at midnight UTC
+  workflow_dispatch:    # Manual trigger
 
 jobs:
-  sync:
+  download_and_extract:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Clear old files
-        run: |
-          find . -mindepth 1 -maxdepth 1 ! -name ".git" ! -name ".github" ! -name ".gitignore" ! -name "dist/config.json" -exec rm -rf {} + || true
-
       - name: Download self-host.zip
-        run: |
-          curl -L -o self-host.zip https://github.com/zardoy/minecraft-web-client/releases/latest/download/self-host.zip
+        run: wget -O self-host.zip https://github.com/zardoy/minecraft-web-client/releases/latest/download/self-host.zip
 
-      - name: Extract self-host.zip
-        run: |
-          unzip -q self-host.zip -d temp_extract
-          rm self-host.zip
-
-      - name: Copy files excluding dist/config.json
-        run: |
-          rsync -av --exclude='dist/config.json' temp_extract/ ./
-
-      - name: Cleanup
-        run: |
-          rm -rf temp_extract
-
-      - name: Verify
-        run: |
-          if [ -f "dist/config.json" ]; then
-            echo "dist/config.json retained successfully."
-          else
-            echo "dist/config.json missing."
-          fi
-
-      - name: Commit and push changes
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add -A
-          if git diff --cached --quiet; then
-            echo "No changes — skipping commit."
-            exit 0
-          fi
-          git commit -m "Update site from latest self-host.zip release"
-          git push
+      - name: Extract ZIP into root
+        run: unzip -o self-host.zip -d ./

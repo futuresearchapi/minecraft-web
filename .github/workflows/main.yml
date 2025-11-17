@@ -2,7 +2,7 @@ name: Sync external minecraft.html release to Netlify
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # every day
+    - cron: "0 0 */2 * *"  # every day
   workflow_dispatch:
 
 jobs:

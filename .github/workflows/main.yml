@@ -14,48 +14,56 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # 2. Check for new release version
-      - name: Check for new release version
-        id: check_version
+      # 2. Clear old site files (keep .git, workflow, .gitignore, and .last_release_version)
+      - name: Clear old files
         run: |
-          # Fetch latest release info
+          find . -mindepth 1 -maxdepth 1 ! -name ".git" ! -name ".github" ! -name ".gitignore" ! -name ".last_release_version" -exec rm -rf {} + || true
+
+      # 3. Check for new release and download minecraft.html only if there's a new release
+      - name: Check for new release and download minecraft.html
+        id: check_release
+        run: |
+          set -e
+          # Fetch latest release info from GitHub API
           latest_release_json=$(curl -s https://api.github.com/repos/zardoy/minecraft-web-client/releases/latest)
           
           # Extract latest release tag
           latest_tag=$(echo "$latest_release_json" | grep -oP '(?<="tag_name": ")[^"]+')
-          
           echo "Latest release tag: $latest_tag"
           
-          # Path to stored version
+          # Path to version file
           VERSION_FILE=".last_release_version"
           
+          # Check if version file exists
           if [ -f "$VERSION_FILE" ]; then
             stored_version=$(cat "$VERSION_FILE")
             echo "Stored version: $stored_version"
           else
             stored_version=""
+            echo "Version file does not exist. Creating it now."
           fi
           
+          # Compare versions
           if [ "$latest_tag" = "$stored_version" ]; then
-            echo "No new release detected. Exiting."
+            echo "No new release detected. Skipping download."
+            echo "download_required=false" >> $GITHUB_OUTPUT
             exit 0
           else
-            echo "New release detected. Proceeding."
+            echo "New release detected. Proceeding to download."
+            echo "download_required=true" >> $GITHUB_OUTPUT
             # Save new version for future runs
             echo "$latest_tag" > "$VERSION_FILE"
+            echo "Saved new version to $VERSION_FILE"
           fi
 
-      # 3. Clear old site files (keep .git, workflow, .gitignore)
-      - name: Clear old files
-        run: |
-          find . -mindepth 1 -maxdepth 1 ! -name ".git" ! -name ".github" ! -name ".gitignore" -exec rm -rf {} + || true
-
-      # 4. Download minecraft.html directly from latest release
+      # Download minecraft.html only if there's a new release
       - name: Download minecraft.html
+        if: steps.check_release.outputs.download_required == 'true'
         run: |
           curl -L -o index.html https://github.com/zardoy/minecraft-web-client/releases/latest/download/minecraft.html
+          echo "Downloaded new minecraft.html."
 
-      # 5. Verify the file exists
+      # 4. Verify the file exists
       - name: Verify index.html
         run: |
           if [ -f index.html ]; then
@@ -65,7 +73,7 @@ jobs:
             exit 0
           fi
 
-      # 6. Commit and push only if there are changes
+      # 5. Commit and push only if there are changes
       - name: Commit and push changes
         run: |
           git config user.name "github-actions"

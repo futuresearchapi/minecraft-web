@@ -26,7 +26,7 @@ jobs:
 
       - name: Copy files excluding dist/config.json
         run: |
-          rsync -av --exclude='dist/config.json' temp_extract/ ./
+          rsync -av temp_extract/ ./
 
       - name: Cleanup
         run: |

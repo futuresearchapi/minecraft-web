@@ -1,4 +1,4 @@
-name: sync
+name: Sync
 
 on:
   schedule:
@@ -39,22 +39,24 @@ jobs:
       - name: Check if update is needed
         id: check_update
         run: |
-          if [ "${{ steps.get_release.outputs.latest_tag }}" = "${{ steps.current_version.outputs.current_tag }}" ]; then
+          LATEST="${{ steps.get_release.outputs.latest_tag }}"
+          CURRENT="${{ steps.current_version.outputs.current_tag || '' }}"
+          if [ "$LATEST" = "$CURRENT" ]; then
             echo "Already up to date. Skipping download."
             echo "update_needed=false" >> $GITHUB_OUTPUT
           else
             echo "New release detected. Will update."
             echo "update_needed=true" >> $GITHUB_OUTPUT
 
-      # 5. Stop workflow if no update needed
+      # 5. Stop workflow if no update
       - name: Exit if no update
         if: ${{ steps.check_update.outputs.update_needed == 'false' }}
         run: exit 0
 
-      # 6. Clear old site files (keep .git, workflow, .gitignore, .version)
+      # 6. Clear old site files (keep all hidden files, including .version)
       - name: Clear old files
         run: |
-          find . -mindepth 1 -maxdepth 1 ! -name ".git" ! -name ".github" ! -name ".gitignore" ! -name ".version" -exec rm -rf {} + || true
+          find . -mindepth 1 -maxdepth 1 ! -name ".*" -exec rm -rf {} + || true
 
       # 7. Download minecraft.html
       - name: Download minecraft.html

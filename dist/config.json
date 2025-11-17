@@ -30,20 +30,10 @@
       "description": "Very nice a polite server. Must try for everyone!"
     }
   ],
-  "rightSideText": "A Minecraft client clone in the browser!",
-  "splashText": "There is nothing we can do",
+  "rightSideText": "Minecraft inside browser.",
+  "splashText": "Amazing!",
   "splashTextFallback": "Welcome!",
-  "pauseLinks": [
-    [
-      {
-        "type": "github"
-      },
-      {
-        "type": "discord"
-      }
-    ]
-  ],
-  "defaultUsername": "mcrafter{0-9999}",
+  "defaultUsername": "dfngbrth{0-9999}",
   "mobileButtons": [
     {
       "action": "general.drop",

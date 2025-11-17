@@ -1,4 +1,4 @@
-name: Sync external minecraft.html release to Netlify
+name: manual
 
 on:
   workflow_dispatch:

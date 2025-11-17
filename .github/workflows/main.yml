@@ -30,24 +30,17 @@ jobs:
           unzip -q self-host.zip -d temp_extract
           rm self-host.zip
 
-      # 5. Copy files excluding /dist/config.json
+      # 5. Copy files excluding dist/config.json using rsync
       - name: Copy files excluding dist/config.json
         run: |
-          shopt -s dotglob
-          for item in temp_extract/*; do
-            if [ -f "$item" ] && [[ "$item" == *"/dist/config.json" ]]; then
-              echo "Skipping $item"
-            else
-              cp -r "$item" .
-            fi
-          done
+          rsync -av --exclude='dist/config.json' temp_extract/ ./
 
       # 6. Clean up
       - name: Cleanup
         run: |
           rm -rf temp_extract
 
-      # 7. Verify extraction
+      # 7. Verify
       - name: Verify
         run: |
           if [ -f "dist/config.json" ]; then
@@ -67,4 +60,4 @@ jobs:
             exit 0
           fi
           git commit -m "Update site from latest self-host.zip release"
-          git push
+          git push￼Enter

@@ -14,17 +14,48 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # 2. Clear old site files (keep .git, workflow, .gitignore)
+      # 2. Check for new release version
+      - name: Check for new release version
+        id: check_version
+        run: |
+          # Fetch latest release info
+          latest_release_json=$(curl -s https://api.github.com/repos/zardoy/minecraft-web-client/releases/latest)
+          
+          # Extract latest release tag
+          latest_tag=$(echo "$latest_release_json" | grep -oP '(?<="tag_name": ")[^"]+')
+          
+          echo "Latest release tag: $latest_tag"
+          
+          # Path to stored version
+          VERSION_FILE=".last_release_version"
+          
+          if [ -f "$VERSION_FILE" ]; then
+            stored_version=$(cat "$VERSION_FILE")
+            echo "Stored version: $stored_version"
+          else
+            stored_version=""
+          fi
+          
+          if [ "$latest_tag" = "$stored_version" ]; then
+            echo "No new release detected. Exiting."
+            exit 0
+          else
+            echo "New release detected. Proceeding."
+            # Save new version for future runs
+            echo "$latest_tag" > "$VERSION_FILE"
+          fi
+
+      # 3. Clear old site files (keep .git, workflow, .gitignore)
       - name: Clear old files
         run: |
           find . -mindepth 1 -maxdepth 1 ! -name ".git" ! -name ".github" ! -name ".gitignore" -exec rm -rf {} + || true
 
-      # 3. Download minecraft.html directly from latest release
+      # 4. Download minecraft.html directly from latest release
       - name: Download minecraft.html
         run: |
           curl -L -o index.html https://github.com/zardoy/minecraft-web-client/releases/latest/download/minecraft.html
 
-      # 4. Verify the file exists
+      # 5. Verify the file exists
       - name: Verify index.html
         run: |
           if [ -f index.html ]; then
@@ -34,7 +65,7 @@ jobs:
             exit 0
           fi
 
-      # 5. Commit and push only if there are changes
+      # 6. Commit and push only if there are changes
       - name: Commit and push changes
         run: |
           git config user.name "github-actions"

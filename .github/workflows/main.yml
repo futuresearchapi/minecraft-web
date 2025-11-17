@@ -10,17 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repo
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      # 2. Clear old site files (keep .git, workflow, .gitignore, and .last_release_version)
-      - name: Clear old files
-        run: |
-          find . -mindepth 1 -maxdepth 1 ! -name ".git" ! -name ".github" ! -name ".gitignore" ! -name ".last_release_version" -exec rm -rf {} + || true
-
-      # 3. Check for new release and download minecraft.html only if there's a new release
-      - name: Check for new release and download minecraft.html
+      # 1. Check for new release and decide whether to proceed
+      - name: Check for new release
         id: check_release
         run: |
           set -e
@@ -45,26 +36,43 @@ jobs:
           
           # Compare versions
           if [ "$latest_tag" = "$stored_version" ]; then
-            echo "No new release detected. Skipping download."
-            echo "download_required=false" >> $GITHUB_OUTPUT
+            echo "No new release detected. Exiting."
+            echo "release_found=false" >> $GITHUB_OUTPUT
             exit 0
           else
-            echo "New release detected. Proceeding to download."
-            echo "download_required=true" >> $GITHUB_OUTPUT
+            echo "New release detected. Proceeding."
+            echo "release_found=true" >> $GITHUB_OUTPUT
             # Save new version for future runs
             echo "$latest_tag" > "$VERSION_FILE"
             echo "Saved new version to $VERSION_FILE"
           fi
 
-      # Download minecraft.html only if there's a new release
+      # Exit early if no new release
+      - name: Stop if no new release
+        if: steps.check_release.outputs.release_found == 'false'
+        run: |
+          echo "No new release. Exiting workflow."
+          exit 0
+
+      # 2. Checkout repo
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # 3. Clear old site files (keep .git, workflow, .gitignore, and .last_release_version)
+      - name: Clear old files
+        run: |
+          find . -mindepth 1 -maxdepth 1 ! -name ".git" ! -name ".github" ! -name ".gitignore" ! -name ".last_release_version" -exec rm -rf {} + || true
+
+      # 4. Download minecraft.html only if there's a new release
       - name: Download minecraft.html
-        if: steps.check_release.outputs.download_required == 'true'
+        if: steps.check_release.outputs.release_found == 'true'
         run: |
           curl -L -o index.html https://github.com/zardoy/minecraft-web-client/releases/latest/download/minecraft.html
           echo "Downloaded new minecraft.html."
 
-      # 4. Verify the file exists
+      # 5. Verify the file exists only if it was downloaded
       - name: Verify index.html
+        if: steps.check_release.outputs.release_found == 'true'
         run: |
           if [ -f index.html ]; then
             echo "index.html downloaded successfully."
@@ -73,8 +81,9 @@ jobs:
             exit 0
           fi
 
-      # 5. Commit and push only if there are changes
+      # 6. Commit and push only if a new release was found and file exists
       - name: Commit and push changes
+        if: steps.check_release.outputs.release_found == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"

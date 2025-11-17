@@ -19,22 +19,44 @@ jobs:
         run: |
           find . -mindepth 1 -maxdepth 1 ! -name ".git" ! -name ".github" ! -name ".gitignore" -exec rm -rf {} + || true
 
-      # 3. Download minecraft.html directly from latest release
-      - name: Download minecraft.html
+      # 3. Download the self-host.zip from latest release
+      - name: Download self-host.zip
         run: |
-          curl -L -o index.html https://github.com/zardoy/minecraft-web-client/releases/latest/download/minecraft.html
+          curl -L -o self-host.zip https://github.com/zardoy/minecraft-web-client/releases/latest/download/self-host.zip
 
-      # 4. Verify the file exists
-      - name: Verify index.html
+      # 4. Extract the archive
+      - name: Extract self-host.zip
         run: |
-          if [ -f index.html ]; then
-            echo "index.html downloaded successfully."
+          unzip -q self-host.zip -d temp_extract
+          rm self-host.zip
+
+      # 5. Copy files excluding /dist/config.json
+      - name: Copy files excluding dist/config.json
+        run: |
+          shopt -s dotglob
+          for item in temp_extract/*; do
+            if [ -f "$item" ] && [[ "$item" == *"/dist/config.json" ]]; then
+              echo "Skipping $item"
+            else
+              cp -r "$item" .
+            fi
+          done
+
+      # 6. Clean up
+      - name: Cleanup
+        run: |
+          rm -rf temp_extract
+
+      # 7. Verify extraction
+      - name: Verify
+        run: |
+          if [ -f "dist/config.json" ]; then
+            echo "dist/config.json retained successfully."
           else
-            echo "index.html not found — skipping commit"
-            exit 0
+            echo "dist/config.json missing."
           fi
 
-      # 5. Commit and push only if there are changes
+      # 8. Commit and push only if there are changes
       - name: Commit and push changes
         run: |
           git config user.name "github-actions"
@@ -44,5 +66,5 @@ jobs:
             echo "No changes — skipping commit."
             exit 0
           fi
-          git commit -m "Update index.html from latest minecraft.html release"
+          git commit -m "Update site from latest self-host.zip release"
           git push

@@ -18,9 +18,9 @@ jobs:
 
       - name: Remove pauseLinks from config.json
         run: |
-          if [ -f ./dost/config.json ]; then
-            jq 'del(.pauseLinks)' ./dost/config.json > ./dost/config.temp.json
-            mv ./dost/config.temp.json ./dost/config.json
+          if [ -f ./dist/config.json ]; then
+            jq 'del(.pauseLinks)' ./dist/config.json > ./dist/config.temp.json
+            mv ./dist/config.temp.json ./dist/config.json
           else
             echo "config.json not found!"
           fi

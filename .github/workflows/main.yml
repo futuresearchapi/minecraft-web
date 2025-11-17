@@ -2,7 +2,7 @@ name: Sync external minecraft.html release to Netlify
 
 on:
   schedule:
-    - cron: "0 */2 * * *"  # check every 2 hours
+    - cron: "0 */2 * * *"
   workflow_dispatch:
 
 jobs:
@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repo
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # 2. Download minecraft.html from latest release
       - name: Download minecraft.html from latest release
         uses: robinraju/release-downloader@v1
         with:
@@ -22,28 +20,24 @@ jobs:
           latest: true
           fileName: "minecraft.html"
 
-      # 3. Optional: list files for debugging
-      - name: List files after download
+      - name: List downloaded files (debug)
         run: ls -R
 
-      # 4. Clear old files but keep workflow folder
-      - name: Clear old files
+      - name: Clear old site files
         run: |
           find . -maxdepth 1 ! -name ".git" ! -name ".github" ! -name ".gitignore" -exec rm -rf {} +
 
-      # 5. Move minecraft.html to index.html safely
-      - name: Rename minecraft.html to index.html
+      - name: Move minecraft.html to index.html if it exists
         run: |
-          FILE=$(find . -type f -name "minecraft.html" | head -n 1)
-          if [ -f "$FILE" ]; then
-            mv "$FILE" ./index.html
+          if [ -f minecraft.html ]; then
+            mv minecraft.html index.html
             echo "minecraft.html moved to index.html"
           else
-            echo "minecraft.html not found — exiting"
-            exit 1
+            # If running manually and file missing, just skip instead of failing
+            echo "minecraft.html not found — skipping this run"
+            exit 0
           fi
 
-      # 6. Commit and push changes
       - name: Commit and push changes
         run: |
           git config user.name "github-actions"

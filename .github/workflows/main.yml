@@ -10,9 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout repo
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      # 2. Download minecraft.html from latest release
       - name: Download minecraft.html from latest release
         uses: robinraju/release-downloader@v1
         with:
@@ -20,13 +22,28 @@ jobs:
           latest: true
           fileName: "minecraft.html"
 
-      - name: Clear old files (keep workflow folder)
+      # 3. Optional: list files for debugging
+      - name: List files after download
+        run: ls -R
+
+      # 4. Clear old files but keep workflow folder
+      - name: Clear old files
         run: |
           find . -maxdepth 1 ! -name ".git" ! -name ".github" ! -name ".gitignore" -exec rm -rf {} +
 
+      # 5. Move minecraft.html to index.html safely
       - name: Rename minecraft.html to index.html
-        run: mv minecraft.html index.html
+        run: |
+          FILE=$(find . -type f -name "minecraft.html" | head -n 1)
+          if [ -f "$FILE" ]; then
+            mv "$FILE" ./index.html
+            echo "minecraft.html moved to index.html"
+          else
+            echo "minecraft.html not found — exiting"
+            exit 1
+          fi
 
+      # 6. Commit and push changes
       - name: Commit and push changes
         run: |
           git config user.name "github-actions"

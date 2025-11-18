@@ -1,4 +1,4 @@
-name: Download, Extract, and Commit
+name: update
 
 on:
   schedule:
@@ -21,6 +21,9 @@ jobs:
 
       - name: Extract ZIP into repo (excluding dist/config.json)
         run: unzip -o self-host.zip -x dist/config.json -d ./
+
+      - name: Remove ZIP file
+        run: rm -f self-host.zip
 
       - name: Configure Git user
         run: |

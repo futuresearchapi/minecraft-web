@@ -1,37 +1,39 @@
 {
-  "version": 2,
+  "version": 1,
   "defaultHost": "<from-proxy>",
   "defaultProxy": "https://proxy.mcraft.fun",
   "mapsProvider": "https://maps.mcraft.fun/",
   "skinTexturesProxy": "",
-  "peerJsServer": "https://p2p.mcraft.fun",
+  "peerJsServer": "",
   "peerJsServerFallback": "https://p2p.mcraft.fun",
   "promoteServers": [
     {
-      "ip": "play.mcraft.fun"
-      "name": "Mcraft"
+      "ip": "wss://play.mcraft.fun"
     },
     {
-      "ip": "play.webmc.fun",
+      "ip": "wss://play.webmc.fun",
       "name": "WebMC"
     },
     {
-      "ip": "ws.fuchsmc.net"
+      "ip": "wss://ws.fuchsmc.net"
     },
     {
-      "ip": "play2.mcraft.fun"
+      "ip": "wss://play2.mcraft.fun"
+    },
+    {
+      "ip": "wss://play-creative.mcraft.fun",
+      "description": "Might be available soon, stay tuned!"
     },
     {
       "ip": "kaboom.pw",
-      "name": "Kaboom",
-      "version": "1.21.8",
-      "description": "Very nice a polite server. (A bit broken)"
+      "version": "1.20.3",
+      "description": "Very nice a polite server. Must try for everyone!"
     }
   ],
-  "rightSideText": "Copyright Mojang AB. Do not distribute!",
-  "splashText": "Minceraft",
-  "splashTextFallback": "Minceraft",
-  "defaultUsername": "steve",
+  "rightSideText": "Copiright Mojang AB. Do not distribute!",
+  "splashText": "",
+  "splashTextFallback": "W",
+  "defaultUsername": "dfngboy{0-9999}",
   "mobileButtons": [
     {
       "action": "general.drop",

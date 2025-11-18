@@ -1,9 +1,9 @@
-name: Download, Extract, and Edit Config
+name: Update
 
 on:
   schedule:
     - cron: '0 0 */2 * *'  # Every 2 days at midnight UTC
-  workflow_dispatch:    # Manual trigger
+  workflow_dispatch:
 
 jobs:
   download_extract_edit:
@@ -13,14 +13,8 @@ jobs:
       - name: Download self-host.zip
         run: wget -O self-host.zip https://github.com/zardoy/minecraft-web-client/releases/latest/download/self-host.zip
 
-      - name: Extract ZIP into root
-        run: unzip -o self-host.zip -d ./
+      - name: Extract ZIP into root (excluding dist/config.json)
+        run: unzip -o self-host.zip -x dist/config.json -d ./
 
-      - name: Remove pauseLinks from config.json
-        run: |
-          if [ -f ./dist/config.json ]; then
-            jq 'del(.pauseLinks)' ./dist/config.json > ./dist/config.temp.json
-            mv ./dist/config.temp.json ./dist/config.json
-          else
-            echo "config.json not found!"
-          fi
+      - name: Done
+        run: echo "Extraction completed. dist/config.json left untouched."

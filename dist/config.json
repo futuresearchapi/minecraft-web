@@ -9,6 +9,7 @@
   "promoteServers": [
     {
       "ip": "play.mcraft.fun"
+      "name": "Mcraft"
     },
     {
       "ip": "play.webmc.fun",
@@ -30,7 +31,7 @@
   "rightSideText": "Copyright Mojang AB. Do not distribute!",
   "splashText": "Minceraft",
   "splashTextFallback": "Minceraft",
-  "defaultUsername": "dfngboy{0-9999}",
+  "defaultUsername": "",
   "mobileButtons": [
     {
       "action": "general.drop",

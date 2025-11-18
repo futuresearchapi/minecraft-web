@@ -12,4 +12,4 @@ A self-hosted, browser-based Minecraft client using the Minecraft Web Client.
 Feel free to fork the repo and submit pull requests.  
 Please follow standard GitHub contribution practices.
 
-Link: (webmc)[https://webmc.netlify.app]
+Link: [https://webmc.netlify.app](webmc)

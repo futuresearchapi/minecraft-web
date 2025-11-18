@@ -1,20 +1,38 @@
-name: Update
+name: Download, Extract, and Commit
 
 on:
   schedule:
-    - cron: '0 0 */2 * *'  # Every 2 days at midnight UTC
+    - cron: '0 0 */2 * *'  # Every 2 days
   workflow_dispatch:
 
 jobs:
-  download_extract_edit:
+  update-files:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write  # Needed to push to repo
+
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
       - name: Download self-host.zip
         run: wget -O self-host.zip https://github.com/zardoy/minecraft-web-client/releases/latest/download/self-host.zip
 
-      - name: Extract ZIP into root (excluding dist/config.json)
+      - name: Extract ZIP into repo (excluding dist/config.json)
         run: unzip -o self-host.zip -x dist/config.json -d ./
 
-      - name: Done
-        run: echo "Extraction completed. dist/config.json left untouched."
+      - name: Configure Git user
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Commit changes if any
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "Auto-update files from ZIP (config.json preserved)"
+            git push
+          else
+            echo "No changes to commit."
+          fi

@@ -31,7 +31,7 @@
   "rightSideText": "Copyright Mojang AB. Do not distribute!",
   "splashText": "Minceraft",
   "splashTextFallback": "Minceraft",
-  "defaultUsername": "",
+  "defaultUsername": "steve",
   "mobileButtons": [
     {
       "action": "general.drop",

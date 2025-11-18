@@ -4,7 +4,7 @@
   "defaultProxy": "https://proxy.mcraft.fun",
   "mapsProvider": "https://maps.mcraft.fun/",
   "skinTexturesProxy": "",
-  "peerJsServer": "",
+  "peerJsServer": "https://p2p.mcraft.fun",
   "peerJsServerFallback": "https://p2p.mcraft.fun",
   "promoteServers": [
     {
@@ -27,23 +27,13 @@
     {
       "ip": "kaboom.pw",
       "version": "1.20.3",
-      "description": "Very nice a polite server. Must try for everyone!"
+      "description": "Very nice a polite server. (A bit broken)"
     }
   ],
-  "rightSideText": "A Minecraft client clone in the browser!",
-  "splashText": "The sunset is coming!",
-  "splashTextFallback": "Welcome!",
-  "pauseLinks": [
-    [
-      {
-        "type": "github"
-      },
-      {
-        "type": "discord"
-      }
-    ]
-  ],
-  "defaultUsername": "mcrafter{0-9999}",
+  "rightSideText": "Minecraft client inside the browser!",
+  "splashText": "How?",
+  "splashTextFallback": "Hello! ",
+  "defaultUsername": "dfngboy{0-9999}",
   "mobileButtons": [
     {
       "action": "general.drop",

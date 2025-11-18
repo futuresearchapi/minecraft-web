@@ -31,8 +31,8 @@
     }
   ],
   "rightSideText": "Copiright Mojang AB. Do not distribute!",
-  "splashText": "",
-  "splashTextFallback": "W",
+  "splashText": " ",
+  "splashTextFallback": " ",
   "defaultUsername": "dfngboy{0-9999}",
   "mobileButtons": [
     {

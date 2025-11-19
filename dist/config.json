@@ -33,7 +33,7 @@
   "rightSideText": "Copiright Mojang AB. Do not distribute!",
   "splashText": " ",
   "splashTextFallback": " ",
-  "defaultUsername": "dfngboy{0-9999}",
+  "defaultUsername": "player_{0-99999}",
   "mobileButtons": [
     {
       "action": "general.drop",

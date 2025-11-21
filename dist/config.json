@@ -1,10 +1,13 @@
 {
+  "alwaysReconnectButton": true,
+  "reportBugButtonWithReconnect": true,
+  "allowAutoConnect": true
   "version": 1,
   "defaultHost": "<from-proxy>",
-  "defaultProxy": "https://proxy.mcraft.fun",
+  "defaultProxy": "https://betacraft.uk",
   "mapsProvider": "https://maps.mcraft.fun/",
   "skinTexturesProxy": "",
-  "peerJsServer": "",
+  "peerJsServer": "https://p2p.mcraft.fun",
   "peerJsServerFallback": "https://p2p.mcraft.fun",
   "promoteServers": [
     {

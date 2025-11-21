@@ -1,7 +1,4 @@
 {
-  "alwaysReconnectButton": true,
-  "reportBugButtonWithReconnect": true,
-  "allowAutoConnect": true
   "version": 1,
   "defaultHost": "<from-proxy>",
   "defaultProxy": "https://betacraft.uk",
